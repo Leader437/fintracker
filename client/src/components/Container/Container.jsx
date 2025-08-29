@@ -1,9 +1,11 @@
-import React from 'react'
+import React from "react";
 
-const Container = ({children}) => {
+const Container = ({ children }) => {
   return (
-    <div className='lg:ml-[min(25vw,300px)] 2xl:ml-[min(25vw,340px)] px-2 sm:px-4 pt-2 pb-15 lg:pb-2'>{children}</div>
-  )
-}
+    <div className="lg:ml-[min(25vw,300px)] 2xl:ml-[min(25vw,340px)] px-2 sm:px-4 pt-2 pb-15 lg:pb-2 max-w-[1200px]">
+      <main>{children}</main>
+    </div>
+  );
+};
 
-export default Container
+export default Container;
