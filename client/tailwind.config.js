@@ -10,9 +10,13 @@ export default {
     },
     extend: {
       fontFamily: {
+        inter: ['Inter', 'sans-serif'],
+        display: ['Red Hat Display', 'sans-serif'],
       },
       colors: {
-        primarycolor: "#FFFFFF",
+        primary: "#242625",
+        secondary: "#fbfbfe",
+        accent: "#7de983",
       },
       screens: {
         'sm': '480px',

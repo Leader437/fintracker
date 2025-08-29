@@ -1,0 +1,42 @@
+.sidebar-link {
+  position: relative;
+  text-decoration: none;
+  color: inherit;
+  transition: color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 0;
+  height: 3px;
+  background: #7de983;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 2px;
+}
+
+.link-label {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar-link:hover .link-label {
+  transform: translateX(1.2rem);
+  transform-origin: left;
+}
+
+.sidebar-link:hover {
+  color: #7de983;
+}
+
+.sidebar-link:hover::after {
+  width: 100%;
+}
+
+
+@media screen and (min-width: 1024px) {
+  .sidebar-link {
+    border-bottom: 1px solid rgba(128, 128, 128, 0.3);
+  }
+}
