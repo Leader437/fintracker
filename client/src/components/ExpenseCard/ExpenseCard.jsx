@@ -11,10 +11,10 @@ const ExpenseCard = ({ expense, currency }) => {
               {expense.amount}{currency}
             </h5>
             <div className="flex gap-3">
-              <button className="text-base text-detail">
+              <button className="text-xl text-detail">
                 <FiEdit />
               </button>
-              <button className="text-lg text-detail">
+              <button className="text-2xl text-detail">
                 <MdDelete />
               </button>
             </div>

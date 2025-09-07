@@ -2,32 +2,19 @@ import ExpenseCard from "../ExpenseCard/ExpenseCard";
 import ExpenseRow from "../ExpenseRow/ExpenseRow";
 import "./ShowExpense.css";
 
-const ShowExpense = ({expenses}) => {
-  const currency = "$";
-
-  // grouped Expenses by date
-  const groupedExpenses = Object.values(
-    expenses.reduce((acc, expense) => {
-      if (!acc[expense.date]) {
-        acc[expense.date] = { date: expense.date, items: [], total: 0 };
-      }
-      acc[expense.date].items.push(expense);
-      acc[expense.date].total += expense.amount;
-      return acc;
-    }, {})
-  );
+const ShowExpense = ({expenses, currency}) => {
 
   return (
     <div>
       <ul>
-        {groupedExpenses.map((group) => (
+        {expenses.map((group) => (
           <li key={group.date} className="mb-14">
             <div className="flex items-center justify-between gap-2 mt-2">
               <p className="px-1 font-semibold text-detail font-display whitespace-nowrap">
                 {group.date}
               </p>
               <p className="px-1 font-semibold text-detail font-display whitespace-nowrap">
-                {group.total}
+                {group.total}{" "}
                 {currency} Total
               </p>
             </div>

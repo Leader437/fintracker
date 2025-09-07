@@ -16,6 +16,7 @@
                 border-[#4A4C4D]
                 bg-transparent
                 text-[#242625]
+                font-display
                 focus:outline-none
                 focus:border-[#7de983]
                 transition-colors duration-300
@@ -32,7 +33,7 @@
             peer-placeholder-shown:top-0
             peer-placeholder-shown:text-sm
             peer-placeholder-shown:text-[#4A4C4D59]
-            -top-4 text-xs text-detail
+            -top-4 text-xs text-detail font-display
             `}
             >
             {label}
