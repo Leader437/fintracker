@@ -8,7 +8,7 @@ const ExpenseCard = ({ expense, currency }) => {
         <div key={expense.id} className="p-3 border rounded-lg shadow-sm">
           <div className="flex items-center justify-between mb-2">
             <h5 className="text-2xl font-medium text-display">
-              {expense.amount}{currency}
+              {expense.amount}{" "}{currency}
             </h5>
             <div className="flex gap-3">
               <button className="text-xl text-detail">

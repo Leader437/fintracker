@@ -2,102 +2,11 @@ import { useState, useMemo } from "react";
 import { Button, Heading, Input, ShowExpense, Select } from "../../components";
 import { IoSearch } from "react-icons/io5";
 import { useFormat } from "../../hooks";
-
-const expenses = [
-  {
-    id: 1,
-    name: "rent",
-    description: "Monthly house rent payment for October.",
-    amount: 370,
-    priority: "high",
-    category: "rent",
-    date: "2023-10-10",
-  },
-  {
-    id: 2,
-    name: "electricity bill",
-    description: "October electricity bill for apartment.",
-    amount: 120,
-    priority: "medium",
-    category: "utilities",
-    date: "2023-10-10",
-  },
-  {
-    id: 3,
-    name: "groceries",
-    description:
-      "Bought groceries from supermarket including fruits and vegetables.",
-    amount: 90,
-    priority: "high",
-    category: "food",
-    date: "2023-10-11",
-  },
-  {
-    id: 4,
-    name: "internet",
-    description: "Broadband bill for the month of October.",
-    amount: 40,
-    priority: "medium",
-    category: "utilities",
-    date: "2023-10-11",
-  },
-  {
-    id: 5,
-    name: "safai ky paisay",
-    description: "",
-    amount: 50,
-    priority: "low",
-    category: "maintenance",
-    date: "2023-11-10",
-  },
-  {
-    id: 6,
-    name: "fuel",
-    description: "Petrol refilling.",
-    amount: 65,
-    priority: "medium",
-    category: "transport",
-    date: "2023-11-10",
-  },
-  {
-    id: 7,
-    name: "dinner",
-    description: "Dinner with friends at local restaurant.",
-    amount: 45,
-    priority: "low",
-    category: "food",
-    date: "2023-11-11",
-  },
-  {
-    id: 8,
-    name: "gym membership",
-    description: "Monthly gym subscription fee.",
-    amount: 30,
-    priority: "medium",
-    category: "health",
-    date: "2023-11-11",
-  },
-  {
-    id: 9,
-    name: "shopping",
-    description: "Bought clothes and shoes.",
-    amount: 150,
-    priority: "low",
-    category: "shopping",
-    date: "2023-11-12",
-  },
-  {
-    id: 10,
-    name: "water bill",
-    description: "",
-    amount: 25,
-    priority: "medium",
-    category: "utilities",
-    date: "2023-11-12",
-  },
-];
+import { useSelector } from "react-redux";
 
 const CurrentExpenses = () => {
+  const expenses = useSelector((state) => state.expense.expenses);
+
   const currency = "Rs";
 
   const [query, setQuery] = useState("");
@@ -107,8 +16,8 @@ const CurrentExpenses = () => {
 
   // derive unique category options (includes "All")
   const categories = useMemo(() => {
-    const setCats = new Set(expenses.map((e) => e.category).filter(Boolean));
-    return ["All", ...Array.from(setCats)];
+    const setCats = new Set(expenses.map((e) => e.category).filter(Boolean));    // creating set of array to keep only unique values of array, using filter(Boolean) to keep only truthy values and avoid the cases with empty category value or empty strings, null, undefined e.t.c
+    return ["All", ...Array.from(setCats)];      // converting set back to array and adding "All" option at the start
   }, [expenses]);
 
   // filtering expenses based on search query
@@ -139,10 +48,10 @@ const CurrentExpenses = () => {
   return (
     <>
       <div className="flex items-baseline justify-between gap-4 pr-1 mb-2">
-        <Heading size="4xl">
+        <Heading className="text-xl sm:text-2xl">
           Current Expenses
         </Heading>
-        <p className="relative text-2xl md:text-3xl font-display top-1 md:top-2">
+        <p className="relative text-xl md:text-3xl font-display top-1 md:top-2">
             {totalAmount}{" "}
             {currency}
         </p>

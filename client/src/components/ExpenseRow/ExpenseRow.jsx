@@ -5,7 +5,7 @@ const ExpenseRow = ({ expense, currency }) => {
   return (
     <>
       <p className="text-sm break-words text-detail">{expense.name}</p>
-      <p className="text-sm text-detail">{expense.amount}{currency}</p>
+      <p className="text-sm text-detail">{expense.amount}{" "}{currency}</p>
       <p className="text-sm text-detail">
         {expense.description ? (
           expense.description.split(" ").length <= 3 ? (
