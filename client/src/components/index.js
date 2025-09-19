@@ -7,6 +7,8 @@ import ShowExpense from "./ShowExpense/ShowExpense";
 import Select from "./Select/Select";
 import ExpenseRow from "./ExpenseRow/ExpenseRow";
 import ExpenseCard from "./ExpenseCard/ExpenseCard";
+import ShowMonths from "./showMonths/ShowMonths";
+import CompareExpenses from "./CompareExpenses/CompareExpenses";
 
 export {
     Sidebar,
@@ -17,5 +19,7 @@ export {
     ShowExpense,
     Select,
     ExpenseRow,
-    ExpenseCard
-};
+    ExpenseCard,
+    ShowMonths,
+    CompareExpenses,
+}

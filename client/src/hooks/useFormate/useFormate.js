@@ -37,7 +37,7 @@ const useFormat = (expenses) => {
             const [year, month, day] = group.date.split("-");
             return {
                 ...group,
-                date: `${monthsNames[month]} ${day}, ${year}`
+                date: `${monthsNames[month.padStart(2, "0")]} ${day}, ${year}`
             };
         });
 

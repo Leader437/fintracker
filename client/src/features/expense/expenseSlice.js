@@ -9,7 +9,16 @@ const initialState = {
             amount: 370,
             priority: "high",
             category: "rent",
-            date: "2023-10-10",
+            date: "2025-09-10",
+        },
+        {
+            id: nanoid(),
+            name: "security",
+            description: "Monthly house security payment for October.",
+            amount: 320,
+            priority: "high",
+            category: "rent",
+            date: "2025-09-12",
         },
         {
             id: nanoid(),

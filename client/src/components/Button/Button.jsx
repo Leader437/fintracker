@@ -14,7 +14,7 @@ const Button = ({
       <span className="shadow" />
       <span className="edge" />
       <div className={`front text-${size}`}>
-        <span className="whitespace-nowrap">{children}</span>
+        <span className="whitespace-nowrap flex items-center gap-1">{children}</span>
       </div>
     </button>
   );

@@ -1,13 +1,14 @@
 import { useState, useMemo } from "react";
 import { Button, Heading, Input, ShowExpense, Select } from "../../components";
-import { IoSearch } from "react-icons/io5";
-import { useFormat } from "../../hooks";
+import { useFormat, useCurrentMonthYear } from "../../hooks";
 import { useSelector } from "react-redux";
 
 const CurrentExpenses = () => {
   const expenses = useSelector((state) => state.expense.expenses);
 
   const currency = "Rs";
+
+  const { month, year, label } = useCurrentMonthYear();
 
   const [query, setQuery] = useState("");
 
@@ -38,12 +39,14 @@ const CurrentExpenses = () => {
     return searchedExpenses.filter((e) => e.category === category);
   }, [searchedExpenses, category]);
 
-  const totalAmount = filteredExpenses.reduce((sum, exp) => {
-    return sum + exp.amount;
-  }, 0);
-
   // format expenses to display using custom hook
   const formattedExpenses = useFormat(filteredExpenses);
+
+  const CurrentExpenses = formattedExpenses.filter(expense => expense.date.includes(month) && expense.date.includes(year));
+
+    const totalAmount = CurrentExpenses.reduce((sum, exp) => {
+    return sum + exp.total
+  }, 0);
 
   return (
     <>
@@ -78,12 +81,12 @@ const CurrentExpenses = () => {
               onChange={(e) => setQuery(e.target.value)}
             />
           </form>
-          <div className="fixed right-2 bottom-18 md:static">
+          <div className="fixed right-2 z-10 bottom-18 md:static">
             <Button size="xs">+ Add Expense</Button>
           </div>
         </div>
       </div>
-      <ShowExpense expenses={formattedExpenses} currency={currency} />
+      <ShowExpense expenses={CurrentExpenses} currency={currency} />
     </>
   );
 };
