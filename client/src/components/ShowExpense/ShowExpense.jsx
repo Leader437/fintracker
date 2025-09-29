@@ -43,7 +43,7 @@ const ShowExpense = ({expenses, currency}) => {
             {/* data row - use paragraphs for text content */}
             <ul>
               {group.items.map((expense) => (
-                <li className="mb-1.5">
+                <li key={expense.id} className="mb-1.5">
                   <div className="expense-grid">
                     <ExpenseRow expense={expense} currency={currency} />
                   </div>

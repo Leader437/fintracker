@@ -1,13 +1,21 @@
 import { useState, useMemo } from "react";
-import { Heading, Select, Input, Button, ShowMonths, CompareExpenses } from "../../components";
+import {
+  Heading,
+  Select,
+  Input,
+  Button,
+  ShowMonths,
+  CompareExpenses,
+} from "../../components";
 import { useSelector } from "react-redux";
 import { useFormat, useCurrentMonthYear } from "../../hooks";
 import { IoIosGitCompare } from "react-icons/io";
+import { GoHistory } from "react-icons/go";
 
 const PreviousExpenses = () => {
   const currency = "Rs";
   const expenses = useSelector((state) => state.expense.expenses);
-  const [compare, setCompare] = useState(false);
+  const [contentType, setContentType] = useState("show");
   const [query, setQuery] = useState("");
 
   const { label } = useCurrentMonthYear();
@@ -79,31 +87,46 @@ const PreviousExpenses = () => {
               onChange={(e) => setQuery(e.target.value)}
             />
           </form>
-          <div className="fixed right-2 bottom-18 z-10 md:static">
-            <Button size="xs" onClick={() => setCompare((prev) => !prev)}>
-              <IoIosGitCompare /> Compare
-            </Button>
+          <div className="fixed z-10 right-2 bottom-18 md:static">
+            {contentType === "show" && (
+              <Button size="xs" onClick={() => setContentType("compare")}>
+                <IoIosGitCompare /> Compare
+              </Button>
+            )}
+            {contentType === "compare" && (
+              <Button size="xs" onClick={() => setContentType("show")}>
+                <GoHistory /> All History
+              </Button>
+            )}
           </div>
         </div>
       </div>
-      <div className="flex flex-col gap-2 w-full">
-        {Object.keys(formatMonthExpenses).map((month) => {
-          const total = formatMonthExpenses[month].reduce(
-            (sum, exp) => sum + exp.total, 0);
+      {contentType === "show" && (
+        <div className="flex flex-col w-full gap-2">
+          {Object.keys(formatMonthExpenses).map((month) => {
+            const total = formatMonthExpenses[month].reduce(
+              (sum, exp) => sum + exp.total,
+              0
+            );
 
-          return label !== month ? (
-            <ShowMonths
-              expenses={formatMonthExpenses[month]}
-              month={month}
-              total={total}
-              currency={currency}
-            />
-          ) : null;
-        })}
-      </div>
-      {compare && <CompareExpenses />}
+            return label !== month ? (
+              <ShowMonths
+                expenses={formatMonthExpenses[month]}
+                month={month}
+                total={total}
+                currency={currency}
+              />
+            ) : null;
+          })}
+        </div>
+      )}
+      {contentType === "compare" && (
+        <CompareExpenses
+          expenses={formattedExpenses}
+        />
+      )}
     </>
   );
-}
+};
 
 export default PreviousExpenses;

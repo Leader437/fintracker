@@ -102,6 +102,97 @@ const initialState = {
             category: "utilities",
             date: "2023-11-12",
         },
+        // Added dummy November 2023 entries with different dates
+        {
+            id: nanoid(),
+            name: "movie night",
+            description: "Cinema tickets.",
+            amount: 28,
+            priority: "low",
+            category: "entertainment",
+            date: "2023-11-01",
+        },
+        {
+            id: nanoid(),
+            name: "pharmacy",
+            description: "Medicine purchase.",
+            amount: 18,
+            priority: "medium",
+            category: "health",
+            date: "2023-11-02",
+        },
+        {
+            id: nanoid(),
+            name: "coffee",
+            description: "Coffee with client.",
+            amount: 9,
+            priority: "low",
+            category: "food",
+            date: "2023-11-03",
+        },
+        {
+            id: nanoid(),
+            name: "parking",
+            description: "Downtown parking fee.",
+            amount: 12,
+            priority: "low",
+            category: "transport",
+            date: "2023-11-04",
+        },
+        {
+            id: nanoid(),
+            name: "subscription",
+            description: "Monthly SaaS subscription.",
+            amount: 25,
+            priority: "medium",
+            category: "services",
+            date: "2023-11-05",
+        },
+        {
+            id: nanoid(),
+            name: "gift",
+            description: "Birthday gift.",
+            amount: 60,
+            priority: "medium",
+            category: "shopping",
+            date: "2023-11-06",
+        },
+        {
+            id: nanoid(),
+            name: "repair",
+            description: "Phone screen repair.",
+            amount: 110,
+            priority: "high",
+            category: "maintenance",
+            date: "2023-11-07",
+        },
+        {
+            id: nanoid(),
+            name: "books",
+            description: "Purchased study materials.",
+            amount: 42,
+            priority: "low",
+            category: "education",
+            date: "2023-11-08",
+        },
+        {
+            id: nanoid(),
+            name: "laundry",
+            description: "Dry cleaning service.",
+            amount: 22,
+            priority: "low",
+            category: "services",
+            date: "2023-11-09",
+        },
+        {
+            id: nanoid(),
+            name: "taxi",
+            description: "Ride to airport.",
+            amount: 35,
+            priority: "medium",
+            category: "transport",
+            date: "2023-11-13",
+        },
     ]
 };
 
@@ -119,7 +210,7 @@ const expenseSlice = createSlice({
                         id: nanoid(),
                         ...expense             // expense is an object which contains the arguments that we passed from the component
                     }
-                }
+                };
             }
         },
         updateExpense: (state, action) => {

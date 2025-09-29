@@ -6,7 +6,7 @@ const ExpenseRow = ({ expense, currency }) => {
     <>
       <p className="text-sm break-words text-detail">{expense.name}</p>
       <p className="text-sm text-detail">{expense.amount}{" "}{currency}</p>
-      <p className="text-sm text-detail">
+      <div className="text-sm text-detail">
         {expense.description ? (
           expense.description.split(" ").length <= 3 ? (
             <span className="block mx-auto">{expense.description}</span>
@@ -24,7 +24,7 @@ const ExpenseRow = ({ expense, currency }) => {
         ) : (
           <span className="block mx-auto">-</span>
         )}
-      </p>
+      </div>
       <p className="text-sm text-detail">{expense.category}</p>
       <p
         className={`text-sm ${

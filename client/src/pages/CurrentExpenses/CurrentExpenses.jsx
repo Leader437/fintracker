@@ -8,7 +8,7 @@ const CurrentExpenses = () => {
 
   const currency = "Rs";
 
-  const { month, year, label } = useCurrentMonthYear();
+  const { month, year } = useCurrentMonthYear();
 
   const [query, setQuery] = useState("");
 
