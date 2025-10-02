@@ -1,7 +1,7 @@
-import { Container, Sidebar } from "./components";
+import { Sidebar, Container } from "../components";
 import { Outlet } from "react-router-dom";
 
-const App = () => {
+const MainLayout = () => {
   return (
     <div>
       <Sidebar />
@@ -12,4 +12,4 @@ const App = () => {
   );
 };
 
-export default App;
+export default MainLayout;

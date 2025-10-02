@@ -9,6 +9,9 @@ import ExpenseRow from "./ExpenseRow/ExpenseRow";
 import ExpenseCard from "./ExpenseCard/ExpenseCard";
 import ShowMonths from "./showMonths/ShowMonths";
 import CompareExpenses from "./CompareExpenses/CompareExpenses";
+import Login from "./Login/Login";
+import SignUp from "./SignUp/SignUp";
+import ForgotPassword from "./ForgotPassword/ForgotPassword";
 
 export {
     Sidebar,
@@ -22,4 +25,7 @@ export {
     ExpenseCard,
     ShowMonths,
     CompareExpenses,
+    Login,
+    SignUp,
+    ForgotPassword
 }
