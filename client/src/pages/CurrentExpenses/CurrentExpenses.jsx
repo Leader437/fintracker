@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Button, Heading, Input, ShowExpense, Select } from "../../components";
+import { Button, Heading, Input, ShowExpense, Select, AddForm } from "../../components";
 import { useFormat, useCurrentMonthYear } from "../../hooks";
 import { useSelector } from "react-redux";
 
@@ -11,6 +11,7 @@ const CurrentExpenses = () => {
   const { month, year } = useCurrentMonthYear();
 
   const [query, setQuery] = useState("");
+  const [showAddForm, setShowAddForm] = useState(false);
 
   // category filter state
   const [category, setCategory] = useState("All");
@@ -81,12 +82,19 @@ const CurrentExpenses = () => {
               onChange={(e) => setQuery(e.target.value)}
             />
           </form>
-          <div className="fixed right-2 z-10 bottom-18 md:static">
-            <Button size="xs">+ Add Expense</Button>
+          <div className="fixed z-10 right-2 bottom-18 md:static">
+            <Button size="xs" onClick={() => setShowAddForm(true)}>
+              + Add Expense
+            </Button>
           </div>
         </div>
       </div>
       <ShowExpense expenses={CurrentExpenses} currency={currency} />
+     
+     <AddForm 
+       open={showAddForm} 
+       onClose={() => setShowAddForm(false)} 
+     />
     </>
   );
 };

@@ -187,6 +187,7 @@ const Account = () => {
               </Button>
               <Button 
                 onClick={handleCancel}
+                category='secondary'
                 className="flex-1 bg-gray-500 sm:flex-none sm:px-8 hover:bg-gray-600"
                 size='sm'
               >

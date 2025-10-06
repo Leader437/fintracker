@@ -77,3 +77,25 @@
 .button .front span {
     user-select: none;
 }
+
+/* Secondary button styles - grey theme for cancel/reject buttons */
+.button-secondary .edge {
+    background: linear-gradient(to left,
+            #6b7280 0%,
+            #9ca3af 8%,
+            #9ca3af 92%,
+            #6b7280 100%);
+}
+
+.button-secondary .front {
+    color: whitesmoke;
+    background: #9ca3af;
+}
+
+.button-secondary:hover .front {
+    background: #8b93a0;
+}
+
+.button-secondary:active .front {
+    background: #6b7280;
+}

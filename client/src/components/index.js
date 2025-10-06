@@ -12,6 +12,7 @@ import CompareExpenses from "./CompareExpenses/CompareExpenses";
 import Login from "./Login/Login";
 import SignUp from "./SignUp/SignUp";
 import ForgotPassword from "./ForgotPassword/ForgotPassword";
+import AddForm from "./AddForm/AddForm";
 
 export {
     Sidebar,
@@ -27,5 +28,6 @@ export {
     CompareExpenses,
     Login,
     SignUp,
-    ForgotPassword
+    ForgotPassword,
+    AddForm
 }
