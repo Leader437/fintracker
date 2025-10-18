@@ -238,7 +238,7 @@ const AddForm = ({ open = false, onClose = () => {} }) => {
                         </div>
                         <div className="flex flex-wrap items-center gap-2 text-xs sm:gap-4 text-detail">
                           <span className="whitespace-nowrap">
-                            {expense.date}
+                            {expense.date.split("-").reverse().join("-")}
                           </span>
                           <span className="whitespace-nowrap">
                             Priority: {expense.priority}
