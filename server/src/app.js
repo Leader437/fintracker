@@ -14,4 +14,12 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 app.use(cookieParser());
 
+
+// routes import
+import userRouter from "./routes/user.routes.js"
+
+
+// routes middleware                  // using .use to mount the router middleware
+app.use('/api/v1/users', userRouter);         // mounting userRouter on /api/users path
+
 export default app;

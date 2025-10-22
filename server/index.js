@@ -3,6 +3,7 @@ import { } from 'dotenv/config'        // already imported and configured dotenv
 import { connectDB, PORT } from './src/config/index.js'
 import app from './src/app.js';
 
+// we are using .get not .use because we are not importing any routes yet and not importing any router, just a test route
 app.get('/api/hello', (req, res) => {
   res.send('Hello World!')
 })
