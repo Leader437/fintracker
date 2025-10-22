@@ -1,20 +1,21 @@
-import express from 'express'
 // this way of importing is not official, but it works because of the way we set "type": "module" in package.json, we are using this to avoid using require() syntax in a module type project till dotenv officially supports ES6 import syntax
 import { } from 'dotenv/config'        // already imported and configured dotenv in main index.js
 import { connectDB, PORT } from './src/config/index.js'
-
-const app = express();
+import app from './src/app.js';
 
 app.get('/api/hello', (req, res) => {
   res.send('Hello World!')
 })
 
-connectDB();
-
-// Start the server
-app.listen(PORT, () => {
-  console.log(`app listening on port ${PORT}`)
-})
+connectDB()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`app listening on port ${PORT}`)
+    })
+  }).catch((error) => {
+    console.error("Failed to connect to the database:", error);
+    process.exit(1); // Exit process with failure
+  });
 
 
 

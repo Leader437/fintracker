@@ -5,11 +5,13 @@ const expenseSchema = new mongoose.Schema(
         expenseName: {
             type: String,
             required: true,
-            min: [3, "give a minimum length of 3"]     // avoid names of 1 or 2 words 
+            min: [3, "give a minimum length of 3"],     // avoid names of 1 or 2 words 
+            index: true    // to optimize search queries on expenseName
         },
         expenseCategory: {
             type: String,
-            required: true
+            required: true,
+            index: true    // to optimize search queries on expenseCategory
         },
         expenseDescription: {
             type: String,
