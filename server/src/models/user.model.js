@@ -8,6 +8,7 @@ const userSchema = new mongoose.Schema(
         username: {
             type: String,
             required: [true, "Username is required"],    // this way we can optionally set an error message if the validation fails
+            lowercase: true,
         },
         email: {
             type: String,
@@ -19,6 +20,11 @@ const userSchema = new mongoose.Schema(
             type: String,
             required: true,
             minlength: [6, "Password must be at least 6 characters long"],     // not using 'min' here because it's for numbers only
+        },
+        refreshToken: {
+            type: String,
+            default: null,
+            required: false,
         },
         avatar: {
             type: String,
