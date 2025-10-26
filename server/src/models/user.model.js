@@ -47,7 +47,7 @@ userSchema.pre('save', async function (next) {              // pre is builtIn mi
     next();
 });
 
-// adding a custom method to the userSchema to compare passwords during login
+// adding a custom method to the userSchema to compare passwords during login    // these methods will be available on all user instances (not the model itself)
 userSchema.methods.comparePassword = async function (candidatePassword) {             // not using arrow functions here cuz it doesn't have access to 'this'
     return await bcrypt.compare(candidatePassword, this.password);
 }
