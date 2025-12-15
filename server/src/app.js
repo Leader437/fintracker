@@ -17,9 +17,12 @@ app.use(cookieParser());
 
 // routes import
 import userRouter from "./routes/user.routes.js"
-
+import expenseRouter from "./routes/expense.routes.js"
 
 // routes middleware                  // using .use to mount the router middleware
 app.use('/api/v1/users', userRouter);         // mounting userRouter on /api/users path
+
+// routes middleware
+app.use('/api/v1/expenses', expenseRouter);
 
 export default app;
