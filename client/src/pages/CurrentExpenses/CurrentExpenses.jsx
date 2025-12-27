@@ -8,7 +8,7 @@ import { fetchExpenses, addExpense, deleteExpense, updateExpense } from "../../f
 const CurrentExpenses = () => {
   const dispatch = useDispatch();
   const { month, year } = useCurrentMonthYear();
-  const expenses = useSelector((state) => state.expense.expenses);
+  const expenses = useSelector((state) => Array.isArray(state.expense.expenses) ? state.expense.expenses : []);
   const loading = useSelector((state) => state.expense.loading);
   const error = useSelector((state) => state.expense.error);
   const currency = "Rs";
@@ -22,7 +22,7 @@ const CurrentExpenses = () => {
 
   // derive unique category options (includes "All")
   const categories = useMemo(() => {
-    const setCats = new Set(expenses.map((e) => e.category).filter(Boolean));
+    const setCats = new Set(expenses?.map((e) => e.category).filter(Boolean));
     return ["All", ...Array.from(setCats)];
   }, [expenses]);
 

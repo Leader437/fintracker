@@ -69,7 +69,7 @@ export const authAPI = {
 
 export const userAPI = {
     getProfile: () => apiRequest('/users/profile'),
-
+    refreshToken: () => apiRequest('/users/refresh-token', { method: 'POST' }),
     updateUserDetail: (data) => apiRequest('/users/update-user-detail', {
         method: 'POST',
         body: data,

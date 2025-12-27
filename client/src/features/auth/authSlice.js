@@ -44,6 +44,16 @@ export const getProfile = createAsyncThunk('auth/getProfile', async (_, { reject
   }
 });
 
+export const refreshToken = createAsyncThunk('auth/refreshToken', async (_, { rejectWithValue }) => {
+  try {
+    // This endpoint should refresh the access token using the refresh token cookie
+    const response = await userAPI.refreshToken();
+    return response;
+  } catch (err) {
+    return rejectWithValue(err);
+  }
+});
+
 const authSlice = createSlice({
   name: 'auth',
   initialState,

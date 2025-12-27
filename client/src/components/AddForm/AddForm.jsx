@@ -22,7 +22,7 @@ const AddForm = ({ open = false, onClose = () => {}, onAddExpense }) => {
   const [showSuggestions, setShowSuggestions] = useState({});
   const [validationMessage, setValidationMessage] = useState("");
 
-  const priorities = ["Low", "Medium", "High"];
+  const priorities = ["low", "medium", "high"];
 
   const {
     register,
@@ -38,12 +38,12 @@ const AddForm = ({ open = false, onClose = () => {}, onAddExpense }) => {
     defaultValues: {
       expenses: [
         {
-          name: "",
-          amount: "",
-          description: "",
-          category: "",
-          priority: "Medium",
-          date: new Date().toISOString().split("T")[0],
+          expenseName: "",
+          expenseAmount: "",
+          expenseDescription: "",
+          expenseCategory: "",
+          expensePriority: "Medium",
+          expenseDate: new Date().toISOString().split("T")[0],
         },
       ],
     },
@@ -59,30 +59,34 @@ const AddForm = ({ open = false, onClose = () => {}, onAddExpense }) => {
   const addExpenseEntry = async () => {
     // Clear any existing validation message
     setValidationMessage("");
-    
+
     // Validate the current expense before adding a new one
     const currentExpenseValid = await trigger(`expenses.${editingIndex}`);
-    
+
     if (!currentExpenseValid) {
-      setValidationMessage("Please complete all required fields before adding another expense.");
+      setValidationMessage(
+        "Please complete all required fields before adding another expense."
+      );
       return;
     }
-    
-    // Also check if category is filled (since it's handled separately)
+
+    // Also check if expenseCategory is filled (since it's handled separately)
     const currentExpense = getValues(`expenses.${editingIndex}`);
-    if (!currentExpense.category) {
-      setValidationMessage("Please select a category before adding another expense.");
-      await trigger(`expenses.${editingIndex}.category`);
+    if (!currentExpense.expenseCategory) {
+      setValidationMessage(
+        "Please select a category before adding another expense."
+      );
+      await trigger(`expenses.${editingIndex}.expenseCategory`);
       return;
     }
 
     append({
-      name: "",
-      amount: "",
-      description: "",
-      category: "",
-      priority: "Medium",
-      date: new Date().toISOString().split("T")[0],
+      expenseName: "",
+      expenseAmount: "",
+      expenseDescription: "",
+      expenseCategory: "",
+      expensePriority: "Medium",
+      expenseDate: new Date().toISOString().split("T")[0],
     });
     setEditingIndex(fields.length);
   };
@@ -91,11 +95,11 @@ const AddForm = ({ open = false, onClose = () => {}, onAddExpense }) => {
     // Clear validation message when user starts typing
     setValidationMessage("");
     setCategoryInputs((prev) => ({ ...prev, [index]: value }));
-    setValue(`expenses.${index}.category`, value);
+    setValue(`expenses.${index}.expenseCategory`, value);
     setShowSuggestions((prev) => ({ ...prev, [index]: true }));
     // Clear category error when user starts typing
-    if (errors.expenses?.[index]?.category) {
-      trigger(`expenses.${index}.category`);
+    if (errors.expenses?.[index]?.expenseCategory) {
+      trigger(`expenses.${index}.expenseCategory`);
     }
   };
 
@@ -103,11 +107,11 @@ const AddForm = ({ open = false, onClose = () => {}, onAddExpense }) => {
     // Clear validation message when user selects
     setValidationMessage("");
     setCategoryInputs((prev) => ({ ...prev, [index]: category }));
-    setValue(`expenses.${index}.category`, category);
+    setValue(`expenses.${index}.expenseCategory`, category);
     setShowSuggestions((prev) => ({ ...prev, [index]: false }));
     // Clear category error when user selects
-    if (errors.expenses?.[index]?.category) {
-      trigger(`expenses.${index}.category`);
+    if (errors.expenses?.[index]?.expenseCategory) {
+      trigger(`expenses.${index}.expenseCategory`);
     }
   };
 
@@ -124,16 +128,17 @@ const AddForm = ({ open = false, onClose = () => {}, onAddExpense }) => {
     if (editingIndex !== index && editingIndex >= 0) {
       const currentExpenseValid = await trigger(`expenses.${editingIndex}`);
       const currentExpense = getValues(`expenses.${editingIndex}`);
-      
+
       if (!currentExpenseValid || !currentExpense.category) {
-        setValidationMessage("Please complete the current expense before editing another one.");
+        setValidationMessage(
+          "Please complete the current expense before editing another one."
+        );
         return;
       }
     }
     setEditingIndex(index);
     setValidationMessage("");
   };
-
 
   const onSubmit = async (data) => {
     // Add new categories to local state
@@ -146,16 +151,20 @@ const AddForm = ({ open = false, onClose = () => {}, onAddExpense }) => {
     if (onAddExpense) {
       // Only add the first expense (single add)
       const expense = data.expenses[0];
-      await onAddExpense(expense, () => {
-        reset();
-        setCategoryInputs({});
-        setShowSuggestions({});
-        setValidationMessage("");
-        setEditingIndex(0);
-        onClose();
-      }, (err) => {
-        setValidationMessage(err?.message || "Failed to add expense");
-      });
+      await onAddExpense(
+        expense,
+        () => {
+          reset();
+          setCategoryInputs({});
+          setShowSuggestions({});
+          setValidationMessage("");
+          setEditingIndex(0);
+          onClose();
+        },
+        (err) => {
+          setValidationMessage(err?.message || "Failed to add expense");
+        }
+      );
     } else {
       reset();
       setCategoryInputs({});
@@ -182,10 +191,10 @@ const AddForm = ({ open = false, onClose = () => {}, onAddExpense }) => {
   const isCurrentExpenseValid = () => {
     const currentExpense = watchedExpenses[editingIndex];
     if (!currentExpense) return false;
-    
+
     const hasErrors = errors.expenses?.[editingIndex];
     const isComplete = isExpenseComplete(currentExpense);
-    
+
     return isComplete && !hasErrors;
   };
 
@@ -244,25 +253,25 @@ const AddForm = ({ open = false, onClose = () => {}, onAddExpense }) => {
                       <div className="flex-1 min-w-0">
                         <div className="flex flex-wrap items-center gap-1 mb-1 sm:gap-2">
                           <h4 className="font-medium text-primary text-sm sm:text-base truncate max-w-[120px] sm:max-w-none">
-                            {expense.name}
+                            {expense.expenseName}
                           </h4>
                           <span className="px-1.5 sm:px-2 py-0.5 text-xs bg-green-100 text-green-700 rounded-full whitespace-nowrap">
-                            Rs {expense.amount}
+                            Rs {expense.expenseAmount}
                           </span>
                           <span className="px-1.5 sm:px-2 py-0.5 text-xs bg-gray-100 text-gray-600 rounded-full truncate max-w-[80px] sm:max-w-none">
-                            {expense.category}
+                            {expense.expenseCategory}
                           </span>
                         </div>
                         <div className="flex flex-wrap items-center gap-2 text-xs sm:gap-4 text-detail">
                           <span className="whitespace-nowrap">
-                            {expense.date.split("-").reverse().join("-")}
+                            {expense.expenseDate.split("-").reverse().join("-")}
                           </span>
                           <span className="whitespace-nowrap">
-                            Priority: {expense.priority}
+                            Priority: {expense.expensePriority}
                           </span>
-                          {expense.description && (
+                          {expense.expenseDescription && (
                             <span className="truncate max-w-[100px] sm:max-w-[200px]">
-                              {expense.description}
+                              {expense.expenseDescription}
                             </span>
                           )}
                         </div>
@@ -336,13 +345,13 @@ const AddForm = ({ open = false, onClose = () => {}, onAddExpense }) => {
                         <Input
                           label="Expense Name"
                           onChange={handleInputChange(() => {})}
-                          {...register(`expenses.${index}.name`, {
+                          {...register(`expenses.${index}.expenseName`, {
                             required: "Name is required",
                           })}
                         />
-                        {errors.expenses?.[index]?.name && (
+                        {errors.expenses?.[index]?.expenseName && (
                           <p className="mt-1 text-sm text-red-600">
-                            {errors.expenses[index].name.message}
+                            {errors.expenses[index].expenseName.message}
                           </p>
                         )}
                       </div>
@@ -353,7 +362,7 @@ const AddForm = ({ open = false, onClose = () => {}, onAddExpense }) => {
                           type="number"
                           step="01"
                           onChange={handleInputChange(() => {})}
-                          {...register(`expenses.${index}.amount`, {
+                          {...register(`expenses.${index}.expenseAmount`, {
                             required: "Amount is required",
                             min: {
                               value: 1,
@@ -361,9 +370,9 @@ const AddForm = ({ open = false, onClose = () => {}, onAddExpense }) => {
                             },
                           })}
                         />
-                        {errors.expenses?.[index]?.amount && (
+                        {errors.expenses?.[index]?.expenseAmount && (
                           <p className="mt-1 text-sm text-red-600">
-                            {errors.expenses[index].amount.message}
+                            {errors.expenses[index].expenseAmount.message}
                           </p>
                         )}
                       </div>
@@ -372,7 +381,7 @@ const AddForm = ({ open = false, onClose = () => {}, onAddExpense }) => {
                         <Input
                           label="Description (Optional)"
                           onChange={handleInputChange(() => {})}
-                          {...register(`expenses.${index}.description`)}
+                          {...register(`expenses.${index}.expenseDescription`)}
                         />
                       </div>
 
@@ -380,7 +389,7 @@ const AddForm = ({ open = false, onClose = () => {}, onAddExpense }) => {
                         {/* Register the hidden field for react-hook-form validation */}
                         <input
                           type="hidden"
-                          {...register(`expenses.${index}.category`, {
+                          {...register(`expenses.${index}.expenseCategory`, {
                             required: "Category is required",
                           })}
                         />
@@ -407,7 +416,7 @@ const AddForm = ({ open = false, onClose = () => {}, onAddExpense }) => {
                                focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent 
                                transition-colors pr-8
                                ${
-                                 errors.expenses?.[index]?.category
+                                 errors.expenses?.[index]?.expenseCategory
                                    ? "border-red-300"
                                    : ""
                                }
@@ -453,9 +462,9 @@ const AddForm = ({ open = false, onClose = () => {}, onAddExpense }) => {
                             </div>
                           )}
                         </div>
-                        {errors.expenses?.[index]?.category && (
+                        {errors.expenses?.[index]?.expenseCategory && (
                           <p className="mt-1 text-sm text-red-600">
-                            {errors.expenses[index].category.message}
+                            {errors.expenses[index].expenseCategory.message}
                           </p>
                         )}
                       </div>
@@ -467,7 +476,7 @@ const AddForm = ({ open = false, onClose = () => {}, onAddExpense }) => {
                         <Select
                           options={priorities}
                           onChange={handleInputChange(() => {})}
-                          {...register(`expenses.${index}.priority`)}
+                          {...register(`expenses.${index}.expensePriority`)}
                         />
                       </div>
 
@@ -476,13 +485,13 @@ const AddForm = ({ open = false, onClose = () => {}, onAddExpense }) => {
                           label="Date"
                           type="date"
                           onChange={handleInputChange(() => {})}
-                          {...register(`expenses.${index}.date`, {
+                          {...register(`expenses.${index}.expenseDate`, {
                             required: "Date is required",
                           })}
                         />
-                        {errors.expenses?.[index]?.date && (
+                        {errors.expenses?.[index]?.expenseDate && (
                           <p className="mt-1 text-sm text-red-600">
-                            {errors.expenses[index].date.message}
+                            {errors.expenses[index].expenseDate.message}
                           </p>
                         )}
                       </div>
@@ -507,9 +516,9 @@ const AddForm = ({ open = false, onClose = () => {}, onAddExpense }) => {
               size="xs"
               disabled={!isCurrentExpenseValid()}
               className={`flex items-center gap-1 px-3 text-sm border border-gray-300 sm:gap-2 sm:text-base sm:px-4 transition-colors ${
-                isCurrentExpenseValid() 
-                  ? 'bg-gray-100 text-primary hover:bg-gray-200' 
-                  : 'bg-gray-50 text-gray-400 cursor-not-allowed'
+                isCurrentExpenseValid()
+                  ? "bg-gray-100 text-primary hover:bg-gray-200"
+                  : "bg-gray-50 text-gray-400 cursor-not-allowed"
               }`}
             >
               <IoAdd />
