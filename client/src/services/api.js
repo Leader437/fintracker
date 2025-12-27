@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
 
 // Create an axios instance
 const api = axios.create({
@@ -11,20 +11,19 @@ const api = axios.create({
 // Helper function for API requests
 const apiRequest = async (endpoint, options = {}) => {
     try {
+        const isFormData = typeof FormData !== 'undefined' && options.body instanceof FormData;
+        
         const response = await api.request({
             url: endpoint,
             method: options.method || "GET",
-            params: options.params || null,          // better to pass query (filter related) params this way rather than appending to URL, this is better for encoding
-            data: options.body ?? null,              // in axios data is used for request body
-            headers: { "Content-Type": "application/json", ...options.headers },
-        })
-
-        return response.data
+            params: options.params || null,
+            data: options.body ?? {},
+            headers: isFormData ? { ...options.headers } : { "Content-Type": "application/json", ...options.headers },
+        });
+        return response.data;
     } catch (error) {
-        const message = error.response?.data?.message || error.response?.message || error.message || 'Api error occurred'
-        const status = error.response?.status || 'N/A'
-
-        throw new Error(`status: ${status}, message: ${message}`)
+        const message = error.response?.data?.message || 'Api error occurred';
+        throw message;
     }
 }
 
@@ -38,10 +37,15 @@ export const authAPI = {
         body: data,
     }),
 
-    register: (data) => apiRequest('/users/register', {
-        method: 'POST',
-        body: data,
-    }),
+    register: (data) => {
+        // If FormData, don't set Content-Type header (let browser set it)
+        const isFormData = typeof FormData !== 'undefined' && data instanceof FormData;
+        return apiRequest('/users/register', {
+            method: 'POST',
+            body: data,
+            headers: isFormData ? {} : { 'Content-Type': 'application/json' },
+        });
+    },
 
     logout: () => apiRequest('/users/logout', {
         method: 'POST',

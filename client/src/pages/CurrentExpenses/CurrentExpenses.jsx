@@ -1,25 +1,29 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import { Button, Heading, Input, ShowExpense, Select, AddForm } from "../../components";
 import { useFormat, useCurrentMonthYear } from "../../hooks";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { fetchExpenses, addExpense, deleteExpense, updateExpense } from "../../features/expense/expenseSlice";
+
 
 const CurrentExpenses = () => {
-  const expenses = useSelector((state) => state.expense.expenses);
-
-  const currency = "Rs";
-
+  const dispatch = useDispatch();
   const { month, year } = useCurrentMonthYear();
-
+  const expenses = useSelector((state) => state.expense.expenses);
+  const loading = useSelector((state) => state.expense.loading);
+  const error = useSelector((state) => state.expense.error);
+  const currency = "Rs";
   const [query, setQuery] = useState("");
   const [showAddForm, setShowAddForm] = useState(false);
-
-  // category filter state
   const [category, setCategory] = useState("All");
+
+  useEffect(() => {
+    dispatch(fetchExpenses());
+  }, [dispatch]);
 
   // derive unique category options (includes "All")
   const categories = useMemo(() => {
-    const setCats = new Set(expenses.map((e) => e.category).filter(Boolean));    // creating set of array to keep only unique values of array, using filter(Boolean) to keep only truthy values and avoid the cases with empty category value or empty strings, null, undefined e.t.c
-    return ["All", ...Array.from(setCats)];      // converting set back to array and adding "All" option at the start
+    const setCats = new Set(expenses.map((e) => e.category).filter(Boolean));
+    return ["All", ...Array.from(setCats)];
   }, [expenses]);
 
   // filtering expenses based on search query
@@ -42,22 +46,25 @@ const CurrentExpenses = () => {
 
   // format expenses to display using custom hook
   const formattedExpenses = useFormat(filteredExpenses);
-
   const CurrentExpenses = formattedExpenses.filter(expense => expense.date.includes(month) && expense.date.includes(year));
+  const totalAmount = CurrentExpenses.reduce((sum, exp) => sum + exp.total, 0);
 
-    const totalAmount = CurrentExpenses.reduce((sum, exp) => {
-    return sum + exp.total
-  }, 0);
+  // Add expense handler
+  const handleAddExpense = useCallback(async (expense, onSuccess, onError) => {
+    try {
+      await dispatch(addExpense(expense)).unwrap();
+      if (onSuccess) onSuccess();
+    } catch (err) {
+      if (onError) onError(err);
+    }
+  }, [dispatch]);
 
   return (
     <>
       <div className="flex items-baseline justify-between gap-4 pr-1 mb-2">
-        <Heading className="text-xl sm:text-2xl">
-          Current Expenses
-        </Heading>
+        <Heading className="text-xl sm:text-2xl">Current Expenses</Heading>
         <p className="relative text-xl md:text-3xl font-display top-1 md:top-2">
-            {totalAmount}{" "}
-            {currency}
+          {totalAmount} {currency}
         </p>
       </div>
       <div className="w-full mb-3 border-b border-[rgba(128,128,128,0.3)]"></div>
@@ -89,12 +96,14 @@ const CurrentExpenses = () => {
           </div>
         </div>
       </div>
+      {loading && <div>Loading...</div>}
+      {error && <div className="text-red-500">{error}</div>}
       <ShowExpense expenses={CurrentExpenses} currency={currency} />
-     
-     <AddForm 
-       open={showAddForm} 
-       onClose={() => setShowAddForm(false)} 
-     />
+      <AddForm 
+        open={showAddForm} 
+        onClose={() => setShowAddForm(false)} 
+        onAddExpense={handleAddExpense}
+      />
     </>
   );
 };

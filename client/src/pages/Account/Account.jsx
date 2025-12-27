@@ -1,51 +1,86 @@
-import { useState } from 'react';
-import { Heading, Button, Select } from '../../components';
-import { VscAccount, VscEdit } from 'react-icons/vsc';
-import { IoCamera } from 'react-icons/io5';
+import { useState, useEffect } from "react";
+import { toast } from "react-toastify";
+import { Heading, Button, Select } from "../../components";
+import { VscAccount, VscEdit } from "react-icons/vsc";
+import { IoCamera } from "react-icons/io5";
+import { useDispatch, useSelector } from "react-redux";
+import { getProfile, logout } from "../../features/auth/authSlice";
+import { userAPI } from "../../services/api";
 
 const Account = () => {
-  const [userProfile, setUserProfile] = useState({
-    name: 'Saif ur Rehman',
-    email: 'saif@example.com',
-    currency: 'PKR',
-    profileImage: null
-  });
-
+  const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.auth);
   const [isEditing, setIsEditing] = useState(false);
-  const [tempProfile, setTempProfile] = useState(userProfile);
+  const [tempProfile, setTempProfile] = useState(
+    user || {
+      name: "",
+      email: "",
+      currency: "PKR",
+      avatar: null,
+    }
+  );
+
+  useEffect(() => {
+    dispatch(getProfile());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (user) setTempProfile(user);
+  }, [user]);
 
   const currencies = [
-    { code: 'USD', symbol: '$', name: 'US Dollar' },
-    { code: 'EUR', symbol: '€', name: 'Euro' },
-    { code: 'GBP', symbol: '£', name: 'British Pound' },
-    { code: 'JPY', symbol: '¥', name: 'Japanese Yen' },
-    { code: 'PKR', symbol: 'Rs', name: 'Pakistani Rupee' },
-    { code: 'INR', symbol: '₹', name: 'Indian Rupee' },
-    { code: 'CAD', symbol: 'C$', name: 'Canadian Dollar' },
-    { code: 'AUD', symbol: 'A$', name: 'Australian Dollar' }
+    { code: "USD", symbol: "$", name: "US Dollar" },
+    { code: "EUR", symbol: "€", name: "Euro" },
+    { code: "GBP", symbol: "£", name: "British Pound" },
+    { code: "JPY", symbol: "¥", name: "Japanese Yen" },
+    { code: "PKR", symbol: "Rs", name: "Pakistani Rupee" },
+    { code: "INR", symbol: "₹", name: "Indian Rupee" },
+    { code: "CAD", symbol: "C$", name: "Canadian Dollar" },
+    { code: "AUD", symbol: "A$", name: "Australian Dollar" },
   ];
 
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
     if (file) {
+      // Show preview
       const reader = new FileReader();
       reader.onload = (e) => {
-        setTempProfile(prev => ({
+        setTempProfile((prev) => ({
           ...prev,
-          profileImage: e.target.result
+          avatar: e.target.result,
+          avatarFile: file, // Store file for upload
         }));
       };
       reader.readAsDataURL(file);
     }
   };
 
-  const handleSave = () => {
-    setUserProfile(tempProfile);
-    setIsEditing(false);
+  // Save profile changes
+  const handleSave = async () => {
+    try {
+      await userAPI.updateUserDetail({
+        username: tempProfile.name,
+        currency: tempProfile.currency,
+      });
+      // Only upload avatar if changed and a new file is present
+      if (
+        tempProfile.avatarFile &&
+        tempProfile.avatar !== user?.avatar
+      ) {
+        const formData = new FormData();
+        formData.append("avatar", tempProfile.avatarFile);
+        await userAPI.updateUserDisplayPicture(formData);
+      }
+      dispatch(getProfile());
+      setIsEditing(false);
+      toast.success("Profile updated successfully!");
+    } catch (err) {
+      toast.error(err.message || "Failed to update profile");
+    }
   };
 
   const handleCancel = () => {
-    setTempProfile(userProfile);
+    setTempProfile(user);
     setIsEditing(false);
   };
 
@@ -53,10 +88,10 @@ const Account = () => {
   const handleCurrencyChange = (e) => {
     const selectedOption = e.target.value;
     // Extract currency code from the selected option string
-    const currencyCode = selectedOption.split(' ')[1]; // Gets "USD" from "$ USD - US Dollar"
-    setTempProfile(prev => ({
+    const currencyCode = selectedOption.split(" ")[1]; // Gets "USD" from "$ USD - US Dollar"
+    setTempProfile((prev) => ({
       ...prev,
-      currency: currencyCode
+      currency: currencyCode,
     }));
   };
 
@@ -65,8 +100,8 @@ const Account = () => {
       <div className="flex items-baseline justify-between gap-4 pr-1 mb-2">
         <Heading className="text-xl sm:text-2xl">Account Settings</Heading>
         {!isEditing && (
-          <Button 
-            size="xs" 
+          <Button
+            size="xs"
             onClick={() => setIsEditing(true)}
             className="relative flex items-center gap-2 top-1"
           >
@@ -75,7 +110,7 @@ const Account = () => {
           </Button>
         )}
       </div>
-      
+
       <div className="w-full mb-6 border-b border-[rgba(128,128,128,0.3)]"></div>
 
       <div className="max-w-2xl">
@@ -83,10 +118,10 @@ const Account = () => {
         <div className="flex flex-col items-center mb-8 sm:flex-row sm:gap-6">
           <div className="relative group">
             <div className="w-24 h-24 overflow-hidden border-4 border-white rounded-full shadow-lg sm:w-32 sm:h-32 bg-secondary">
-              {tempProfile.profileImage ? (
-                <img 
-                  src={tempProfile.profileImage} 
-                  alt="Profile" 
+              {tempProfile.avatar ? (
+                <img
+                  src={tempProfile.avatar}
+                  alt="Profile"
                   className="object-cover w-full h-full"
                 />
               ) : (
@@ -95,13 +130,13 @@ const Account = () => {
                 </div>
               )}
             </div>
-            
+
             {isEditing && (
               <label className="absolute inset-0 flex items-center justify-center transition-opacity rounded-full opacity-0 cursor-pointer bg-black/40 group-hover:opacity-100">
                 <IoCamera className="text-xl text-white" />
-                <input 
-                  type="file" 
-                  accept="image/*" 
+                <input
+                  type="file"
+                  accept="image/*"
                   onChange={handleImageUpload}
                   className="hidden"
                 />
@@ -111,11 +146,12 @@ const Account = () => {
 
           <div className="mt-4 text-center sm:mt-0 sm:text-left sm:flex-1">
             <h2 className="text-lg font-bold sm:text-xl text-primary">
-              {userProfile.name}
+              {tempProfile.name}
             </h2>
-            <p className="mt-1 text-sm text-detail">{userProfile.email}</p>
+            <p className="mt-1 text-sm text-detail">{tempProfile.email}</p>
             <div className="inline-block px-3 py-1 mt-2 text-xs font-medium rounded-full bg-accent/10 text-accent">
-              {currencies.find(c => c.code === userProfile.currency)?.symbol} {userProfile.currency}
+              {currencies.find((c) => c.code === tempProfile.currency)?.symbol}{" "}
+              {tempProfile.currency}
             </div>
           </div>
         </div>
@@ -132,16 +168,18 @@ const Account = () => {
                 <input
                   type="text"
                   value={tempProfile.name}
-                  onChange={(e) => setTempProfile(prev => ({
-                    ...prev,
-                    name: e.target.value
-                  }))}
+                  onChange={(e) =>
+                    setTempProfile((prev) => ({
+                      ...prev,
+                      name: e.target.value,
+                    }))
+                  }
                   className="w-full px-4 py-3 transition-colors border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent"
                   placeholder="Enter your full name"
                 />
               ) : (
                 <div className="px-4 py-3 rounded-lg bg-gray-50 text-primary">
-                  {userProfile.name}
+                  {tempProfile.name}
                 </div>
               )}
             </div>
@@ -152,7 +190,7 @@ const Account = () => {
                 Email Address
               </label>
               <div className="px-4 py-3 rounded-lg bg-gray-50 text-detail">
-                {userProfile.email}
+                {tempProfile.email}
               </div>
             </div>
 
@@ -162,14 +200,30 @@ const Account = () => {
                 Preferred Currency
               </label>
               {isEditing ? (
-                <Select 
-                  value={`${currencies.find(c => c.code === tempProfile.currency)?.symbol} ${tempProfile.currency} - ${currencies.find(c => c.code === tempProfile.currency)?.name}`}
+                <Select
+                  value={`${
+                    currencies.find((c) => c.code === tempProfile.currency)
+                      ?.symbol
+                  } ${tempProfile.currency} - ${
+                    currencies.find((c) => c.code === tempProfile.currency)
+                      ?.name
+                  }`}
                   onChange={handleCurrencyChange}
-                  options={currencies.map(c => `${c.symbol} ${c.code} - ${c.name}`)} 
+                  options={currencies.map(
+                    (c) => `${c.symbol} ${c.code} - ${c.name}`
+                  )}
                 />
               ) : (
                 <div className="px-4 py-3 rounded-lg bg-gray-50 text-primary">
-                  {currencies.find(c => c.code === userProfile.currency)?.symbol} {userProfile.currency} - {currencies.find(c => c.code === userProfile.currency)?.name}
+                  {
+                    currencies.find((c) => c.code === tempProfile.currency)
+                      ?.symbol
+                  }{" "}
+                  {tempProfile.currency} -{" "}
+                  {
+                    currencies.find((c) => c.code === tempProfile.currency)
+                      ?.name
+                  }
                 </div>
               )}
             </div>
@@ -178,18 +232,18 @@ const Account = () => {
           {/* Action Buttons */}
           {isEditing && (
             <div className="flex flex-col gap-3 pt-6 mt-8 border-t border-gray-100 sm:flex-row">
-              <Button 
+              <Button
                 onClick={handleSave}
                 className="flex-1 sm:flex-none sm:px-8"
-                size='sm'
+                size="sm"
               >
                 Save Changes
               </Button>
-              <Button 
+              <Button
                 onClick={handleCancel}
-                category='secondary'
+                category="secondary"
                 className="flex-1 bg-gray-500 sm:flex-none sm:px-8 hover:bg-gray-600"
-                size='sm'
+                size="sm"
               >
                 Cancel
               </Button>
@@ -199,12 +253,33 @@ const Account = () => {
 
         {/* Additional Info */}
         <div className="p-4 mt-6 border rounded-lg bg-accent/5 border-accent/10">
-          <h3 className="mb-2 text-sm font-medium text-primary">Account Information</h3>
+          <h3 className="mb-2 text-sm font-medium text-primary">
+            Account Information
+          </h3>
           <ul className="space-y-1 text-xs text-detail">
-            <li>• Your currency preference affects how amounts are displayed throughout the app</li>
+            <li>
+              • Your currency preference affects how amounts are displayed
+              throughout the app
+            </li>
             <li>• Profile image changes are saved immediately when uploaded</li>
-            <li>• Email address is linked to your account and cannot be modified here</li>
+            <li>
+              • Email address is linked to your account and cannot be modified
+              here
+            </li>
           </ul>
+        </div>
+
+        {/* Logout Button at the bottom */}
+        <div className="flex justify-start mt-10">
+          <Button
+            onClick={async () => {
+              await dispatch(logout());
+              window.location.href = "/auth?mode=login";
+            }}
+            className="px-6 py-2 text-white bg-red-500 rounded hover:bg-red-600"
+          >
+            Logout
+          </Button>
         </div>
       </div>
     </div>

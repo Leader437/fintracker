@@ -4,7 +4,7 @@ import { Button, Input, Select, Heading } from "../index";
 import { IoAdd, IoClose, IoChevronDown } from "react-icons/io5";
 import { BiTrash, BiEdit } from "react-icons/bi";
 
-const AddForm = ({ open = false, onClose = () => {} }) => {
+const AddForm = ({ open = false, onClose = () => {}, onAddExpense }) => {
   const [categories, setCategories] = useState([
     "Food",
     "Transport",
@@ -134,19 +134,36 @@ const AddForm = ({ open = false, onClose = () => {} }) => {
     setValidationMessage("");
   };
 
-  const onSubmit = (data) => {
+
+  const onSubmit = async (data) => {
+    // Add new categories to local state
     data.expenses.forEach((expense) => {
       if (expense.category && !categories.includes(expense.category)) {
         setCategories((prev) => [...prev, expense.category]);
       }
     });
-    console.log("Expense data:", data);
-    reset();
-    setCategoryInputs({});
-    setShowSuggestions({});
-    setValidationMessage("");
-    setEditingIndex(0);
-    onClose();
+
+    if (onAddExpense) {
+      // Only add the first expense (single add)
+      const expense = data.expenses[0];
+      await onAddExpense(expense, () => {
+        reset();
+        setCategoryInputs({});
+        setShowSuggestions({});
+        setValidationMessage("");
+        setEditingIndex(0);
+        onClose();
+      }, (err) => {
+        setValidationMessage(err?.message || "Failed to add expense");
+      });
+    } else {
+      reset();
+      setCategoryInputs({});
+      setShowSuggestions({});
+      setValidationMessage("");
+      setEditingIndex(0);
+      onClose();
+    }
   };
 
   const handleClose = () => {

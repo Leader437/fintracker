@@ -1,13 +1,21 @@
+
 import { useState } from "react";
+import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 import { Button, Heading, Input } from "../index";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { register as registerUser } from "../../features/auth/authSlice";
 import { BiEdit } from "react-icons/bi";
 
-const Signup = () => {
-  const [profileImage, setProfileImage] = useState(null);
-  const [imageError, setImageError] = useState("");
 
+const Signup = () => {
+  const [avatar, setAvatar] = useState(null); // File for upload
+  const [avatarPreview, setAvatarPreview] = useState(null); // base64 for preview
+  const [imageError, setImageError] = useState("");
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { loading, error } = useSelector((state) => state.auth);
   const {
     register,
     handleSubmit,
@@ -16,8 +24,20 @@ const Signup = () => {
   } = useForm();
 
   const SubmitFunc = async (data) => {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    console.log("Signup data:", { ...data, profileImage });
+    try {
+      const formData = new FormData();
+      Object.entries(data).forEach(([key, value]) => {
+        formData.append(key, value);
+      });
+      if (avatar) {
+        formData.append("avatar", avatar);
+      }
+      await dispatch(registerUser(formData)).unwrap();
+      toast.success("Account created successfully! Welcome.");
+      navigate("/");
+    } catch (err) {
+      toast.error(err || "Registration failed. Please try again.");
+    }
   };
 
   const password = watch("password");
@@ -27,11 +47,11 @@ const Signup = () => {
     setImageError("");
 
     if (file) {
-      // Check file size (2MB = 2 * 1024 * 1024 bytes)
       const maxSize = 2 * 1024 * 1024;
       if (file.size > maxSize) {
         setImageError("Image size must be less than 2MB");
-        setProfileImage(null);
+        setAvatar(null);
+        setAvatarPreview(null);
         e.target.value = "";
         return;
       }
@@ -39,15 +59,17 @@ const Signup = () => {
       // Check file type
       if (!file.type.startsWith("image/")) {
         setImageError("Please upload an image file");
-        setProfileImage(null);
+        setAvatar(null);
+        setAvatarPreview(null);
         e.target.value = "";
         return;
       }
 
-      // Create preview URL
+      setAvatar(file);
+      // Create base64 preview
       const reader = new FileReader();
       reader.onloadend = () => {
-        setProfileImage(reader.result);
+        setAvatarPreview(reader.result);
       };
       reader.readAsDataURL(file);
     }
@@ -61,22 +83,22 @@ const Signup = () => {
             <Heading className="mb-8 text-3xl">Sign Up</Heading>
 
             {/* Profile Picture Upload */}
-            <div className="flex justify-center mb-10">
+            <div className="flex justify-center mb-6">
               <div className="relative group">
                 <input
                   type="file"
-                  id="profilePicture"
+                  id="avatar"
                   accept="image/*"
                   onChange={handleImageChange}
                   className="hidden"
                 />
                 <label
-                  htmlFor="profilePicture"
+                  htmlFor="avatar"
                   className="relative block w-24 h-24 overflow-hidden transition-all border-2 border-gray-300 rounded-full cursor-pointer hover:border-accent"
                 >
-                  {profileImage ? (
+                  {avatarPreview ? (
                     <img
-                      src={profileImage}
+                      src={avatarPreview}
                       alt="Profile"
                       className="object-cover w-full h-full"
                     />
@@ -92,7 +114,7 @@ const Signup = () => {
                     </div>
                   )}
                   {/* Hover overlay */}
-                  <div className="absolute inset-0 flex items-center justify-center transition-opacity bg-black/20 rounded-full opacity-0 bg-opacity-60 group-hover:opacity-100">
+                  <div className="absolute inset-0 flex items-center justify-center transition-opacity rounded-full opacity-0 bg-black/20 bg-opacity-60 group-hover:opacity-100">
                     <BiEdit className="text-2xl text-white" />
                   </div>
                 </label>
@@ -108,7 +130,7 @@ const Signup = () => {
               <Input
                 label="Full Name"
                 type="text"
-                {...register("name", {
+                {...register("username", {
                   required: "Name is required",
                   minLength: {
                     value: 2,
@@ -178,8 +200,8 @@ const Signup = () => {
               )}
             </div>
             <div>
-              <Button type="submit" size="sm" className="w-full">
-                Create Account
+              <Button type="submit" size="sm" className="w-full" disabled={loading}>
+                {loading ? "Creating..." : "Create Account"}
               </Button>
             </div>
           </div>
