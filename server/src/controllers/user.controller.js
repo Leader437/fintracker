@@ -54,14 +54,17 @@ const registerUser = asyncHandler(async (req, res) => {
         avatar: req.body.avatar || ""
     })
 
-    // confirming user creation and storing result excluding password, refreshToken in the createdUser
-    const createdUser = await User.findById(user._id).select('-password -refreshToken');                 // .select() here is a built-in mongoose function which selects all the fields except the ones written in it's () with a '-'
-    if (!createdUser) {
+    // fetch the full user document (with refreshToken field)
+    const fullUser = await User.findById(user._id);
+    if (!fullUser) {
         throw new ApiError(500, "Something went wrong while creating the user");
     }
 
     // generating tokens to make the user logged in automatically after registration
-    const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(createdUser);
+    const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(fullUser);
+
+    // fetch user for response (exclude password and refreshToken)
+    const createdUser = await User.findById(user._id).select('-password -refreshToken');
 
     const options = {
         httpOnly: true,      // cookie cannot be updated from client-side
