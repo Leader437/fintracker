@@ -3,7 +3,7 @@ import Container from "./Container/Container";
 import Button from "./Button/Button";
 import Heading from "./Heading/Heading";
 import Input from "./Input/Input";
-import ShowExpense from "./ShowExpense/ShowExpense";
+import ShowExpense, { NoExpenses } from "./ShowExpense/ShowExpense";
 import Select from "./Select/Select";
 import ExpenseRow from "./ExpenseRow/ExpenseRow";
 import ExpenseCard from "./ExpenseCard/ExpenseCard";
@@ -13,6 +13,8 @@ import Login from "./Login/Login";
 import SignUp from "./SignUp/SignUp";
 import ForgotPassword from "./ForgotPassword/ForgotPassword";
 import AddForm from "./AddForm/AddForm";
+import ConfirmModal from "./ConfirmModal/ConfirmModal";
+import EditExpenseModal from "./EditExpenseModal/EditExpenseModal";
 
 export {
     Sidebar,
@@ -21,6 +23,7 @@ export {
     Heading,
     Input,
     ShowExpense,
+    NoExpenses,
     Select,
     ExpenseRow,
     ExpenseCard,
@@ -29,5 +32,7 @@ export {
     Login,
     SignUp,
     ForgotPassword,
-    AddForm
-}
+    AddForm,
+    ConfirmModal,
+    EditExpenseModal
+};

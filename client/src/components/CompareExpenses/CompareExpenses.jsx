@@ -12,9 +12,11 @@ import {
 
 const CompareExpenses = ({ expenses = [] }) => {
   // flatten/normalize incoming data first to {amount, date}
-  const flatExpenses = expenses.map((e) => {
-    return { amount: e.total, date: e.items[0].date };
-  });
+  const flatExpenses = Array.isArray(expenses) && expenses.length > 0
+    ? expenses.map((e) => {
+        return { amount: e.total, date: e.items && e.items[0] ? e.items[0].date : "" };
+      })
+    : [];
 
   // Extract unique months from normalized expenses
   const availableMonths = useMemo(() => {
@@ -99,6 +101,9 @@ const CompareExpenses = ({ expenses = [] }) => {
     [isSmall]
   );
 
+  if (!Array.isArray(expenses) || expenses.length === 0) {
+    return <div className="text-sm text-gray-500">No data available to compare.</div>;
+  }
   return (
     <div
       className="relative p-6 pt-0"

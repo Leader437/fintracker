@@ -46,8 +46,12 @@ const CurrentExpenses = () => {
 
   // format expenses to display using custom hook
   const formattedExpenses = useFormat(filteredExpenses);
-  const CurrentExpenses = formattedExpenses.filter(expense => expense.date.includes(month) && expense.date.includes(year));
-  const totalAmount = CurrentExpenses.reduce((sum, exp) => sum + exp.total, 0);
+  const CurrentExpenses = Array.isArray(formattedExpenses)
+    ? formattedExpenses.filter(expense => expense.date.includes(month) && expense.date.includes(year))
+    : [];
+  const totalAmount = Array.isArray(CurrentExpenses) && CurrentExpenses.length > 0
+    ? CurrentExpenses.reduce((sum, exp) => sum + exp.total, 0)
+    : 0;
 
   // Add expense handler
   const handleAddExpense = useCallback(async (expense, onSuccess, onError) => {

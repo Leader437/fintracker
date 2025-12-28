@@ -8,9 +8,16 @@ const createExpense = asyncHandler(async (req, res) => {
     const { expenseName, expenseCategory, expenseDescription, expenseDate, expenseAmount, expensePriority } = req.body;
     const userId = req.user._id;
 
-    // checking if any of the info is missing
-    if ([expenseName, expenseCategory, expenseDescription, expenseDate, expenseAmount, expensePriority].some(field => field?.trim() === "")) {        // returning true if even one of the field is empty
-            throw new ApiError(400, "All fields are required");
+    // Best practice: Only trim string fields, check others for null/undefined
+    if (
+        !expenseName || typeof expenseName !== 'string' || expenseName.trim() === '' ||
+        !expenseCategory || typeof expenseCategory !== 'string' || expenseCategory.trim() === '' ||
+        expenseDescription === undefined || expenseDescription === null ||
+        !expensePriority || typeof expensePriority !== 'string' || expensePriority.trim() === '' ||
+        expenseAmount === undefined || expenseAmount === null ||
+        expenseDate === undefined || expenseDate === null
+    ) {
+        throw new ApiError(400, "All fields are required");
     }
 
     const expense = await Expense.create({
@@ -36,6 +43,62 @@ const createExpense = asyncHandler(async (req, res) => {
     .json(new ApiResponse(201, createdExpense, "Expense created successfully"));
 })
 
+const createExpensesBulk = asyncHandler(async (req, res) => {
+    const { expenses } = req.body;
+    const userId = req.user._id;
+
+    if (!Array.isArray(expenses) || expenses.length === 0) {
+        throw new ApiError(400, "Expenses array is required");
+    }
+
+    const formattedExpenses = expenses.map(exp => {
+        const {
+            expenseName,
+            expenseCategory,
+            expenseDescription,
+            expenseDate,
+            expenseAmount,
+            expensePriority
+        } = exp;
+
+        if (
+            !expenseName ||
+            !expenseCategory ||
+            !expenseDescription ||
+            !expenseDate ||
+            expenseAmount == null ||
+            !expensePriority
+        ) {
+            throw new ApiError(400, "All fields are required for each expense");
+        }
+
+        return {
+            expenseName,
+            expenseCategory,
+            expenseDescription,
+            expenseDate,
+            expenseAmount,
+            expensePriority,
+            createdBy: userId
+        };
+    });
+
+    const createdExpenses = await Expense.insertMany(formattedExpenses, {
+        ordered: false
+    });
+
+    const sanitizedExpenses = createdExpenses.map(exp => {
+        const obj = exp.toObject();
+        delete obj.createdBy;
+        return obj;
+    });
+
+    res
+        .status(201)
+        .json(new ApiResponse(201, sanitizedExpenses, "Expenses created successfully"));
+});
+
+
 const getExpense = asyncHandler(async (req, res) => {
     const userId = req.user._id;
 
@@ -57,9 +120,16 @@ const updateExpense = asyncHandler(async (req, res) => {
     const userId = req.user._id;
     const { expenseName, expenseCategory, expenseDescription, expenseDate, expenseAmount, expensePriority } = req.body;
 
-    // checking if any of the info is missing
-    if ([expenseName, expenseCategory, expenseDescription, expenseDate, expenseAmount, expensePriority].some(field => field?.trim() === "")) {        // returning true if even one of the field is empty
-            throw new ApiError(400, "All fields are required");
+    // Best practice: Only trim string fields, check others for null/undefined
+    if (
+        !expenseName || typeof expenseName !== 'string' || expenseName.trim() === '' ||
+        !expenseCategory || typeof expenseCategory !== 'string' || expenseCategory.trim() === '' ||
+        expenseDescription === undefined || expenseDescription === null ||
+        !expensePriority || typeof expensePriority !== 'string' || expensePriority.trim() === '' ||
+        expenseAmount === undefined || expenseAmount === null ||
+        expenseDate === undefined || expenseDate === null
+    ) {
+        throw new ApiError(400, "All fields are required");
     }
 
     const expense = await Expense.findOneAndUpdate(
@@ -101,6 +171,7 @@ const deleteExpense = asyncHandler(async (req, res) => {
 
 export {
     createExpense,
+    createExpensesBulk,
     getExpense,
     updateExpense,
     deleteExpense

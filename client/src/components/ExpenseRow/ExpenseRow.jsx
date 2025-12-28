@@ -2,17 +2,35 @@ import { MdDelete } from "react-icons/md";
 import { FiEdit } from "react-icons/fi";
 import { useDispatch } from "react-redux";
 import { deleteExpense } from "../../features/expense/expenseSlice";
+import { useState } from "react";
+import { ConfirmModal, EditExpenseModal } from "../index";
 
 const ExpenseRow = ({ expense, currency }) => {
   const dispatch = useDispatch();
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [showEdit, setShowEdit] = useState(false);
 
   const handleDelete = () => {
-    if (window.confirm("Are you sure you want to delete this expense?")) {
-      dispatch(deleteExpense(expense._id));
-    }
+    setShowConfirm(true);
   };
 
-  // Edit handler can be implemented as needed
+  const handleConfirmDelete = () => {
+    dispatch(deleteExpense(expense._id));
+    setShowConfirm(false);
+  };
+
+  const handleCancelDelete = () => {
+    setShowConfirm(false);
+  };
+
+
+  const handleEdit = () => {
+    setShowEdit(true);
+  };
+
+  const handleCloseEdit = () => {
+    setShowEdit(false);
+  };
 
   return (
     <>
@@ -50,13 +68,21 @@ const ExpenseRow = ({ expense, currency }) => {
         {expense.priority}
       </p>
       <div className="flex gap-3">
-        <button className="text-base text-detail" disabled>
+        <button className="text-base text-detail" onClick={handleEdit}>
           <FiEdit />
         </button>
+          <EditExpenseModal open={showEdit} onClose={handleCloseEdit} expense={expense} />
         <button className="text-lg text-detail" onClick={handleDelete}>
           <MdDelete />
         </button>
       </div>
+      <ConfirmModal
+        open={showConfirm}
+        title="Delete Expense"
+        message="Are you sure you want to delete this expense? This action cannot be undone."
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+      />
     </>
   );
 };

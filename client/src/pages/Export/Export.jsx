@@ -1,6 +1,6 @@
 import { useSelector } from "react-redux"
 import { useFormat } from "../../hooks"
-import { Button, Heading } from "../../components"
+import { Button, Heading, NoExpenses } from "../../components"
 import { BsDownload } from "react-icons/bs"
 import jsPDF from "jspdf"
 
@@ -10,14 +10,16 @@ const Export = () => {
 
   const formattedExpenses = useFormat(expenses)
 
-  const formatMonthExpenses = formattedExpenses.reduce((acc, expense) => {
-    const [month, day, year] = expense.date.split(" ")
-    if (!acc[`${month} ${year}`]) {
-      acc[`${month} ${year}`] = []
-    }
-    acc[`${month} ${year}`].push(expense)
-    return acc
-  }, {})
+  const formatMonthExpenses = Array.isArray(formattedExpenses) && formattedExpenses.length > 0
+    ? formattedExpenses.reduce((acc, expense) => {
+        const [month, day, year] = expense.date.split(" ");
+        if (!acc[`${month} ${year}`]) {
+          acc[`${month} ${year}`] = [];
+        }
+        acc[`${month} ${year}`].push(expense);
+        return acc;
+      }, {})
+    : {};
 
 const handleDownload = (monthKey) => {
   const doc = new jsPDF()
@@ -109,41 +111,41 @@ const handleDownload = (monthKey) => {
       </div>
       <div className="w-full mb-3 border-b border-[rgba(128,128,128,0.3)]"></div>
 
-      {Object.keys(formatMonthExpenses).length === 0 && (
-        <p className="text-sm text-gray-500">No expenses available.</p>
+      {Object.keys(formatMonthExpenses).length === 0 ? (
+        <NoExpenses />
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {Object.keys(formatMonthExpenses).map((m) => (
+            <div
+              key={m}
+              className="relative p-4 transition bg-white border rounded-lg shadow-sm border-gray-200/70 hover:shadow-md group"
+            >
+              <div className="flex items-start justify-between mb-2">
+                <h2 className="text-base font-semibold leading-tight">{m}</h2>
+                <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-slate-100 text-primary">
+                  {formatMonthExpenses[m].length}{" "}
+                  {formatMonthExpenses[m].length === 1
+                    ? "day data"
+                    : "days data"}
+                </span>
+              </div>
+              <p className="mb-1 text-sm text-gray-500">Total Spent</p>
+              <p className="text-lg font-bold text-gray-800">
+                {currency}{" "}
+                {Array.isArray(formatMonthExpenses[m]) ? formatMonthExpenses[m].reduce((sum, e) => sum + e.total, 0) : 0}
+              </p>
+
+              <div className="mt-4">
+                <Button size="xs" onClick={() => handleDownload(m)}>
+                  <BsDownload />
+                </Button>
+              </div>
+
+              <div className="absolute inset-x-0 bottom-0 h-1 transition-all origin-left scale-x-0 rounded-b-lg bg-accent group-hover:scale-x-100"></div>
+            </div>
+          ))}
+        </div>
       )}
-
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {Object.keys(formatMonthExpenses).map((m) => (
-          <div
-            key={m}
-            className="relative p-4 transition bg-white border rounded-lg shadow-sm border-gray-200/70 hover:shadow-md group"
-          >
-            <div className="flex items-start justify-between mb-2">
-              <h2 className="text-base font-semibold leading-tight">{m}</h2>
-              <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-slate-100 text-primary">
-                {formatMonthExpenses[m].length}{" "}
-                {formatMonthExpenses[m].length === 1
-                  ? "day data"
-                  : "days data"}
-              </span>
-            </div>
-            <p className="mb-1 text-sm text-gray-500">Total Spent</p>
-            <p className="text-lg font-bold text-gray-800">
-              {currency}{" "}
-              {formatMonthExpenses[m].reduce((sum, e) => sum + e.total, 0)}
-            </p>
-
-            <div className="mt-4">
-              <Button size="xs" onClick={() => handleDownload(m)}>
-                <BsDownload />
-              </Button>
-            </div>
-
-            <div className="absolute inset-x-0 bottom-0 h-1 transition-all origin-left scale-x-0 rounded-b-lg bg-accent group-hover:scale-x-100"></div>
-          </div>
-        ))}
-      </div>
     </div>
   )
 }

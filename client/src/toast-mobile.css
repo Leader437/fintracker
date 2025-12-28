@@ -1,0 +1,19 @@
+/* Custom Toast styles for mobile responsiveness */
+@media (max-width: 640px) {
+  .Toastify__toast {
+    min-width: 0 !important;
+    max-width: 90vw !important;
+    width: 90vw !important;
+    font-size: 0.95rem !important;
+    padding: 0.75rem 1rem !important;
+    margin: 0.5rem auto !important;
+    left: 0 !important;
+    right: 0 !important;
+  }
+  .Toastify__toast-container {
+    width: 100vw !important;
+    left: 0 !important;
+    right: 0 !important;
+    padding: 0 !important;
+  }
+}

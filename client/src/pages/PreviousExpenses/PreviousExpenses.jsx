@@ -6,6 +6,7 @@ import {
   Button,
   ShowMonths,
   CompareExpenses,
+  NoExpenses,
 } from "../../components";
 import { useSelector } from "react-redux";
 import { useFormat, useCurrentMonthYear } from "../../hooks";
@@ -49,16 +50,16 @@ const PreviousExpenses = () => {
   // format expenses to display using custom hook
   const formattedExpenses = useFormat(filteredExpenses);
 
-  const formatMonthExpenses = formattedExpenses.reduce((acc, expense) => {
-    const [month, day, year] = expense.date.split(" ");
-
-    if (!acc[`${month} ${year}`]) {
-      acc[`${month} ${year}`] = [];
-    }
-
-    acc[`${month} ${year}`].push(expense);
-    return acc;
-  }, {});
+  const formatMonthExpenses = Array.isArray(formattedExpenses) && formattedExpenses.length > 0
+    ? formattedExpenses.reduce((acc, expense) => {
+        const [month, day, year] = expense.date.split(" ");
+        if (!acc[`${month} ${year}`]) {
+          acc[`${month} ${year}`] = [];
+        }
+        acc[`${month} ${year}`].push(expense);
+        return acc;
+      }, {})
+    : {};
 
   return (
     <>
@@ -103,21 +104,23 @@ const PreviousExpenses = () => {
       </div>
       {contentType === "show" && (
         <div className="flex flex-col w-full gap-2">
-          {Object.keys(formatMonthExpenses).map((month) => {
-            const total = formatMonthExpenses[month].reduce(
-              (sum, exp) => sum + exp.total,
-              0
-            );
-
-            return label !== month ? (
-              <ShowMonths
-                expenses={formatMonthExpenses[month]}
-                month={month}
-                total={total}
-                currency={currency}
-              />
-            ) : null;
-          })}
+          {Object.keys(formatMonthExpenses).length === 0 ? (
+            <NoExpenses />
+          ) : (
+            Object.keys(formatMonthExpenses).map((month) => {
+              const total = Array.isArray(formatMonthExpenses[month])
+                ? formatMonthExpenses[month].reduce((sum, exp) => sum + exp.total, 0)
+                : 0;
+              return label !== month ? (
+                <ShowMonths
+                  expenses={formatMonthExpenses[month]}
+                  month={month}
+                  total={total}
+                  currency={currency}
+                />
+              ) : null;
+            })
+          )}
         </div>
       )}
       {contentType === "compare" && (

@@ -1,9 +1,25 @@
+
 import ExpenseCard from "../ExpenseCard/ExpenseCard";
 import ExpenseRow from "../ExpenseRow/ExpenseRow";
 import "./ShowExpense.css";
+import { MdOutlineRemoveShoppingCart } from "react-icons/md";
+
+export const NoExpenses = () => (
+  <div className="flex flex-col items-center justify-center min-h-[40vh] w-full">
+    <MdOutlineRemoveShoppingCart className="text-7xl mb-3 text-gray-400" />
+    <div className="text-lg font-normal text-gray-500 font-display">No expenses for now</div>
+  </div>
+);
 
 const ShowExpense = ({expenses, currency}) => {
-
+  if (!Array.isArray(expenses) || expenses.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[40vh] w-full">
+        <MdOutlineRemoveShoppingCart className="text-7xl mb-3 text-gray-400" />
+        <div className="text-lg font-normal text-gray-500 font-display">No expenses for now</div>
+      </div>
+    );
+  }
   return (
     <div>
       <ul>
@@ -42,14 +58,18 @@ const ShowExpense = ({expenses, currency}) => {
             </div>
             {/* data row - use paragraphs for text content */}
             <ul>
-              {group.items.map((expense) => (
-                <li key={expense.id} className="mb-1.5">
-                  <div className="expense-grid">
-                    <ExpenseRow expense={expense} currency={currency} />
-                  </div>
-                  <ExpenseCard expense={expense} currency={currency} />
-                </li>
-              ))}
+              {Array.isArray(group.items) && group.items.length > 0 ? (
+                group.items.map((expense) => (
+                  <li key={expense.id} className="mb-1.5">
+                    <div className="expense-grid">
+                      <ExpenseRow expense={expense} currency={currency} />
+                    </div>
+                    <ExpenseCard expense={expense} currency={currency} />
+                  </li>
+                ))
+              ) : (
+                <li className="text-xs text-gray-400">No items for this date.</li>
+              )}
             </ul>
           </li>
         ))}

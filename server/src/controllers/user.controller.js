@@ -23,10 +23,10 @@ const generateAccessAndRefreshTokens = async (user) => {
 }
 
 const registerUser = asyncHandler(async (req, res) => {
-    const { username, email, password, currency } = req.body
+    const { username, email, password } = req.body
 
     // checking if any of the info is missing
-    if ([username, email, password, currency].some(field => field?.trim() === "")) {        // returning true if even one of the field is empty
+    if ([username, email, password].some(field => field?.trim() === "")) {        // returning true if even one of the field is empty
         throw new ApiError(400, "All fields are required");
     }
 
@@ -51,8 +51,7 @@ const registerUser = asyncHandler(async (req, res) => {
         username,
         email,
         password,
-        avatar: req.body.avatar || "",
-        currency
+        avatar: req.body.avatar || ""
     })
 
     // confirming user creation and storing result excluding password, refreshToken in the createdUser
@@ -332,4 +331,30 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     }
 });
 
-export { registerUser, loginUser, logoutUser, updateUserDetail, updateUserDisplayPicture, forgotPassword, verifyOTP, refreshAccessToken, resetPassword };
+const getUserProfile = asyncHandler(async (req, res) => {
+    const user = req.user;
+
+    if (!user) {
+        return res.status(401).json(new ApiResponse(401, null, 'User not logged in'))
+    }
+
+    const foundUser = await User.findById(user._id).select('-password -refreshToken');
+
+    if (!foundUser) {
+        throw new ApiError(404, "User not found");
+    }
+
+    const userDetail = {
+        _id: foundUser._id,
+        name: foundUser.username,
+        email: foundUser.email,
+        currency: foundUser.currency,
+        avatar: foundUser.avatar,
+    }
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, userDetail, 'User logged In'));
+});
+
+export { registerUser, loginUser, logoutUser, updateUserDetail, updateUserDisplayPicture, forgotPassword, verifyOTP, refreshAccessToken, resetPassword, getUserProfile };

@@ -1,22 +1,17 @@
 import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchExpenses } from "../../features/expense/expenseSlice";
+import { selectGlobalCategories } from "../../features/expense/expenseSlice";
+import { expenseAPI } from "../../services/api";
+import { toast, ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 import { useForm, useFieldArray } from "react-hook-form";
 import { Button, Input, Select, Heading } from "../index";
 import { IoAdd, IoClose, IoChevronDown } from "react-icons/io5";
 import { BiTrash, BiEdit } from "react-icons/bi";
 
 const AddForm = ({ open = false, onClose = () => {}, onAddExpense }) => {
-  const [categories, setCategories] = useState([
-    "Food",
-    "Transport",
-    "Utilities",
-    "Entertainment",
-    "Health",
-    "Shopping",
-    "Education",
-    "Services",
-    "Rent",
-    "Maintenance",
-  ]);
+  const categories = useSelector(selectGlobalCategories);
   const [editingIndex, setEditingIndex] = useState(0);
   const [categoryInputs, setCategoryInputs] = useState({});
   const [showSuggestions, setShowSuggestions] = useState({});
@@ -42,7 +37,7 @@ const AddForm = ({ open = false, onClose = () => {}, onAddExpense }) => {
           expenseAmount: "",
           expenseDescription: "",
           expenseCategory: "",
-          expensePriority: "Medium",
+          expensePriority: "medium",
           expenseDate: new Date().toISOString().split("T")[0],
         },
       ],
@@ -85,7 +80,7 @@ const AddForm = ({ open = false, onClose = () => {}, onAddExpense }) => {
       expenseAmount: "",
       expenseDescription: "",
       expenseCategory: "",
-      expensePriority: "Medium",
+      expensePriority: "medium",
       expenseDate: new Date().toISOString().split("T")[0],
     });
     setEditingIndex(fields.length);
@@ -140,38 +135,42 @@ const AddForm = ({ open = false, onClose = () => {}, onAddExpense }) => {
     setValidationMessage("");
   };
 
-  const onSubmit = async (data) => {
-    // Add new categories to local state
-    data.expenses.forEach((expense) => {
-      if (expense.category && !categories.includes(expense.category)) {
-        setCategories((prev) => [...prev, expense.category]);
-      }
-    });
+  const dispatch = useDispatch();
 
-    if (onAddExpense) {
-      // Only add the first expense (single add)
-      const expense = data.expenses[0];
-      await onAddExpense(
-        expense,
-        () => {
-          reset();
-          setCategoryInputs({});
-          setShowSuggestions({});
-          setValidationMessage("");
-          setEditingIndex(0);
-          onClose();
-        },
-        (err) => {
-          setValidationMessage(err?.message || "Failed to add expense");
-        }
-      );
-    } else {
+  const onSubmit = async (data) => {
+    // No need to update categories here; global list is derived from Redux after fetch
+
+    // Prepare payloads for API
+    const mappedExpenses = data.expenses.map((expense) => ({
+      expenseName: expense.expenseName,
+      expenseCategory: expense.expenseCategory,
+      expenseDescription: expense.expenseDescription,
+      expenseDate: expense.expenseDate,
+      expenseAmount: expense.expenseAmount,
+      expensePriority: expense.expensePriority,
+    }));
+
+    try {
+      let response;
+      if (mappedExpenses.length === 1) {
+        // Single expense
+        response = await expenseAPI.addExpense(mappedExpenses[0]);
+      } else {
+        // Bulk expenses
+        response = await expenseAPI.addExpensesBulk(mappedExpenses);
+      }
       reset();
       setCategoryInputs({});
       setShowSuggestions({});
-      setValidationMessage("");
       setEditingIndex(0);
-      onClose();
+      // Refresh expenses list
+      dispatch(fetchExpenses());
+      toast.success('Expenses added successfully!');
+      setTimeout(() => {
+        onClose();
+      }, 150);
+    } catch (err) {
+      setValidationMessage(err?.message || 'Failed to add expense(s)');
     }
   };
 
@@ -185,7 +184,7 @@ const AddForm = ({ open = false, onClose = () => {}, onAddExpense }) => {
   };
 
   const isExpenseComplete = (expense) => {
-    return expense.name && expense.amount && expense.category;
+    return expense && expense.expenseName && expense.expenseAmount && expense.expenseCategory;
   };
 
   const isCurrentExpenseValid = () => {
@@ -502,7 +501,7 @@ const AddForm = ({ open = false, onClose = () => {}, onAddExpense }) => {
             );
           })}
 
-          {/* Validation Message */}
+          {/* Validation Message (only for errors) */}
           {validationMessage && (
             <div className="p-3 mb-4 text-sm text-red-700 border border-red-200 rounded-lg bg-red-50">
               {validationMessage}

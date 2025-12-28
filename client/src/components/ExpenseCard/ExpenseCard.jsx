@@ -1,18 +1,33 @@
+
 import { MdDelete } from "react-icons/md";
 import { FiEdit } from "react-icons/fi";
 import { useDispatch } from "react-redux";
+import { useState } from "react";
 import { deleteExpense } from "../../features/expense/expenseSlice";
+import { ConfirmModal, EditExpenseModal } from "../index";
 
 const ExpenseCard = ({ expense, currency }) => {
   const dispatch = useDispatch();
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [showEdit, setShowEdit] = useState(false);
 
   const handleDelete = () => {
-    if (window.confirm("Are you sure you want to delete this expense?")) {
-      dispatch(deleteExpense(expense._id));
-    }
+    setShowConfirm(true);
+  };
+  const handleConfirmDelete = () => {
+    dispatch(deleteExpense(expense._id));
+    setShowConfirm(false);
+  };
+  const handleCancelDelete = () => {
+    setShowConfirm(false);
   };
 
-  // Edit handler can be implemented as needed
+  const handleEdit = () => {
+    setShowEdit(true);
+  };
+  const handleCloseEdit = () => {
+    setShowEdit(false);
+  };
 
   return (
     <div>
@@ -23,7 +38,7 @@ const ExpenseCard = ({ expense, currency }) => {
               {expense.amount} {currency}
             </h5>
             <div className="flex gap-3">
-              <button className="text-xl text-detail" disabled>
+              <button className="text-xl text-detail" onClick={handleEdit}>
                 <FiEdit />
               </button>
               <button className="text-2xl text-detail" onClick={handleDelete}>
@@ -55,6 +70,14 @@ const ExpenseCard = ({ expense, currency }) => {
               <span className="font-semibold text-primary">Description:</span> {expense.description}
             </p>
           )}
+          <EditExpenseModal open={showEdit} onClose={handleCloseEdit} expense={expense} />
+          <ConfirmModal
+            open={showConfirm}
+            title="Delete Expense"
+            message="Are you sure you want to delete this expense? This action cannot be undone."
+            onConfirm={handleConfirmDelete}
+            onCancel={handleCancelDelete}
+          />
         </div>
       </div>
     </div>

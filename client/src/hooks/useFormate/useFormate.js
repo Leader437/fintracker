@@ -15,16 +15,22 @@ const useFormat = (expenses) => {
             "10": "October",
             "11": "November",
             "12": "December"
+        };
+
+        // Defensive: if expenses is not an array or is empty, return empty array
+        if (!Array.isArray(expenses) || expenses.length === 0) {
+            return [];
         }
 
         // grouped Expenses by date
         let groupedExpenses = Object.values(
             expenses.reduce((acc, expense) => {
+                if (!expense || !expense.date) return acc;
                 if (!acc[expense.date]) {
                     acc[expense.date] = { date: expense.date, items: [], total: 0 };
                 }
                 acc[expense.date].items.push(expense);
-                acc[expense.date].total += expense.amount;
+                acc[expense.date].total += Number(expense.amount) || 0;
                 return acc;
             }, {})
         );

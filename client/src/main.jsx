@@ -14,6 +14,7 @@ import { Provider, useDispatch, useSelector } from "react-redux";
 import { store } from "./store/store.js";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import "./toast-mobile.css";
 import { getProfile, refreshToken, logout } from "./features/auth/authSlice";
 import { useState } from "react";
 

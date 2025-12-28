@@ -8,7 +8,8 @@ import {
     updateUserDisplayPicture,
     forgotPassword,
     verifyOTP,
-    resetPassword
+    resetPassword,
+    getUserProfile
 } from "../controllers/user.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
@@ -22,6 +23,7 @@ router.route('/verify-otp').post(verifyOTP);
 router.route('/reset-password').post(resetPassword);
 
 // secured routes
+router.route('/profile').get(verifyJWT, getUserProfile);
 router.route('/logout').post(verifyJWT, logoutUser);
 router.route('/update-user-detail').post(verifyJWT, updateUserDetail);
 router.route('/refresh-token').post(refreshAccessToken);          // no need to verify JWT here as we are already checking refresh tokens in the controller

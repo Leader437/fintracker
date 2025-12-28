@@ -81,10 +81,16 @@ export const userAPI = {
     }),
 };
 
+
 export const expenseAPI = {
     addExpense: (data) => apiRequest('/expenses/add-expense', {
         method: 'POST',
         body: data,
+    }),
+
+    addExpensesBulk: (expenses) => apiRequest('/expenses/add-expenses-bulk', {
+        method: 'POST',
+        body: { expenses },
     }),
 
     getExpenses: () => apiRequest('/expenses/get-expense'),
