@@ -69,6 +69,7 @@ const registerUser = asyncHandler(async (req, res) => {
     const options = {
         httpOnly: true,      // cookie cannot be updated from client-side
         secure: true,
+        sameSite: 'none',    // to allow cross-site cookie (from client to server on different domains)
     };
 
     // sending success response and setting tokens in cookie to login user automatically
@@ -106,6 +107,7 @@ const loginUser = asyncHandler(async (req, res) => {
     const options = {
         httpOnly: true,      // cookie cannot be updated from client-side
         secure: true,
+        sameSite: 'none',    // to allow cross-site cookie (from client to server on different domains)
     };
 
     return res
@@ -229,6 +231,7 @@ const logoutUser = asyncHandler(async (req, res) => {
     const options = {
         httpOnly: true,
         secure: true,
+        sameSite: 'none',      // to allow cross-site cookie (from client to server on different domains)
         expires: new Date(0),  // Set cookie expiration to the past
     };
 
@@ -322,6 +325,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
         const options = {
             httpOnly: true,
             secure: true,
+            sameSite: 'none',    // to allow cross-site cookie (from client to server on different domains)
         };
 
         return res
