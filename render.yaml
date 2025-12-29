@@ -1,0 +1,52 @@
+services:
+  - type: web
+    name: fintracker-server
+    env: docker
+    dockerfilePath: server/Dockerfile
+    plan: free
+    envVars:
+      - key: PORT
+        fromSecret: PORT
+      - key: DB_USERNAME
+        fromSecret: DB_USERNAME
+      - key: DB_PASSWORD
+        fromSecret: DB_PASSWORD
+      - key: MONGO_URI
+        fromSecret: MONGO_URI
+      - key: CORS_ORIGIN
+        fromSecret: CORS_ORIGIN
+      - key: ACCESS_TOKEN_SECRET
+        fromSecret: ACCESS_TOKEN_SECRET
+      - key: ACCESS_TOKEN_EXPIRY
+        fromSecret: ACCESS_TOKEN_EXPIRY
+      - key: REFRESH_TOKEN_SECRET
+        fromSecret: REFRESH_TOKEN_SECRET
+      - key: REFRESH_TOKEN_EXPIRY
+        fromSecret: REFRESH_TOKEN_EXPIRY
+      - key: OTP_TOKEN_SECRET
+        fromSecret: OTP_TOKEN_SECRET
+      - key: OTP_TOKEN_EXPIRY
+        fromSecret: OTP_TOKEN_EXPIRY
+      - key: CLOUDINARY_CLOUD_NAME
+        fromSecret: CLOUDINARY_CLOUD_NAME
+      - key: CLOUDINARY_API_KEY
+        fromSecret: CLOUDINARY_API_KEY
+      - key: CLOUDINARY_API_SECRET
+        fromSecret: CLOUDINARY_API_SECRET
+      - key: EMAIL_USER
+        fromSecret: EMAIL_USER
+      - key: EMAIL_PASS
+        fromSecret: EMAIL_PASS
+      - key: BCRYPT_SALT_ROUNDS
+        fromSecret: BCRYPT_SALT_ROUNDS
+    autoDeploy: true
+
+  - type: web
+    name: fintracker-client
+    env: docker
+    dockerfilePath: client/Dockerfile
+    plan: free
+    envVars:
+      - key: VITE_API_URL
+        fromSecret: VITE_API_URL
+    autoDeploy: true
