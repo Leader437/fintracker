@@ -7,7 +7,7 @@ import ShowExpense, { NoExpenses } from "./ShowExpense/ShowExpense";
 import Select from "./Select/Select";
 import ExpenseRow from "./ExpenseRow/ExpenseRow";
 import ExpenseCard from "./ExpenseCard/ExpenseCard";
-import ShowMonths from "./showMonths/ShowMonths";
+import ShowMonths from "./ShowMonths/ShowMonths";
 import CompareExpenses from "./CompareExpenses/CompareExpenses";
 import Login from "./Login/Login";
 import SignUp from "./SignUp/SignUp";
