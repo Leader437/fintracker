@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 import { Heading, Button, Select } from "../../components";
 import { VscAccount, VscEdit } from "react-icons/vsc";
 import { IoCamera } from "react-icons/io5";
@@ -19,6 +20,8 @@ const Account = () => {
       avatar: null,
     }
   );
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     dispatch(getProfile());
@@ -274,7 +277,7 @@ const Account = () => {
           <Button
             onClick={async () => {
               await dispatch(logout());
-              window.location.href = "/auth?mode=login";
+              navigate('/auth?mode=login', { replace: true });
             }}
             className="px-6 py-2 text-white bg-red-500 rounded hover:bg-red-600"
           >
