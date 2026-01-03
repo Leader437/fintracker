@@ -64,7 +64,6 @@ const createExpensesBulk = asyncHandler(async (req, res) => {
         if (
             !expenseName ||
             !expenseCategory ||
-            !expenseDescription ||
             !expenseDate ||
             expenseAmount == null ||
             !expensePriority
